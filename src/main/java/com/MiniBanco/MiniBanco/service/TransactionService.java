@@ -1,14 +1,12 @@
-package com.MiniBanco.MiniBanco.Domain.services;
+package com.MiniBanco.MiniBanco.service;
 
-import com.MiniBanco.MiniBanco.Domain.repository.TransactionRepository;
+import com.MiniBanco.MiniBanco.repository.TransactionRepository;
 import com.MiniBanco.MiniBanco.Domain.transaction.TransactionDTO;
 import com.MiniBanco.MiniBanco.Transactions.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import sun.security.krb5.internal.ccache.MemoryCredentialsCache;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -24,8 +22,10 @@ private UserService userService;
 private RestTemplate restTemplate;
 @Autowired
 private TransactionRepository transactionRepository;
+@Autowired
+private NotificationService notificationService;
 
-    public Object createTransaction(TransactionDTO transaction) throws Exception{
+    public Transaction createTransaction(TransactionDTO transaction) throws Exception{
         var payer = this.userService.findUserById(transaction.payerId());
         var payee = this.userService.findUserById(transaction.payeeId());
         userService.validateUser(payer, transaction.amount());
@@ -35,19 +35,23 @@ private TransactionRepository transactionRepository;
             throw new Exception("Não Autorizado!");
         }
 
-        com.MiniBanco.MiniBanco.Transactions.Transaction newTransaction = new Transaction();
+        Transaction newTransaction = new Transaction();
         newTransaction.setAmount(transaction.amount());
         newTransaction.setPayee(payee);
         newTransaction.setPayer(payer);
         newTransaction.setTransactionTime(LocalDateTime.now());
-
-
-        payer.setBalance(payer.getBalance().subtract(transaction.amount());
+        payer.setBalance(payer.getBalance().subtract(transaction.amount()));
         payee.setBalance(payee.getBalance().add(transaction.amount()));
 
-        this.repository.save(newTransaction);
+        this.transactionRepository.save(newTransaction);
         this.userService.saveUser(payee);
         this.userService.saveUser(payer);
+
+        notificationService.sendNotification(payer, "Transação realizada com sucesso.");
+        notificationService.sendNotification(payee, "Transação recebida com sucesso.");
+
+
+        return newTransaction;
 
     }
     public  boolean authorizeTransaction(){
@@ -56,5 +60,7 @@ private TransactionRepository transactionRepository;
             String message = (String) response.getBody().get("message");
             return "Autorizado".equalsIgnoreCase(message);
         }else return false;
+
+
     }
 }

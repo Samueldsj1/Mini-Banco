@@ -1,6 +1,6 @@
-package com.MiniBanco.MiniBanco.Domain.controller;
+package com.MiniBanco.MiniBanco.controller;
 
-import com.MiniBanco.MiniBanco.Domain.services.UserService;
+import com.MiniBanco.MiniBanco.service.UserService;
 import com.MiniBanco.MiniBanco.Domain.user.User;
 import com.MiniBanco.MiniBanco.Domain.user.UserDTO;
 import org.springframework.beans.factory.annotation.Autowired;

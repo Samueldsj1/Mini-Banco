@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity(name="transactions")
 @Table(name="transactions")
@@ -26,7 +27,7 @@ public class Transaction {
     @ManyToOne
     @JoinColumn(name= "payee_id")
     private User payee;
-    private LocalDate transactionTime;
+    private LocalDateTime transactionTime;
 
     public Transaction() {
 

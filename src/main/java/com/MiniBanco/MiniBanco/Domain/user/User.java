@@ -33,6 +33,7 @@ public class User {
         this.document = dto.document();
         this.balance = dto.balance();
         this.password = dto.password();
+        this.userType = dto.userType();
 
     }
 }
